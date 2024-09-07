@@ -1,11 +1,15 @@
 package com.egar.library.service;
 
+import com.egar.library.entity.Comment;
 import com.egar.library.entity.User;
 import com.egar.library.model.UserDTO;
+import com.egar.library.repos.CommentRepository;
 import com.egar.library.repos.UserRepository;
 
 import java.util.List;
 
+import com.egar.library.util.NotFoundException;
+import com.egar.library.util.ReferencedWarning;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class UserService implements CRUDService<UserDTO> {
 
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public List<UserDTO> findAll() {
@@ -74,4 +79,17 @@ public class UserService implements CRUDService<UserDTO> {
         user.setPassword(userDTO.getPassword());
         return user;
     }
+    public ReferencedWarning getReferencedWarning(final Long id) {
+        final ReferencedWarning referencedWarning = new ReferencedWarning();
+        final User user = userRepository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        final Comment userComment = (Comment) commentRepository;
+        if (userComment != null) {
+            referencedWarning.setKey("user.comment.user.referenced");
+            referencedWarning.addParam(userComment.getId());
+            return referencedWarning;
+        }
+        return null;
+    }
+
 }

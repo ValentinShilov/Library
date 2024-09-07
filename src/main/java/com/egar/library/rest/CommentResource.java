@@ -47,6 +47,7 @@ public class CommentResource {
     @PutMapping("/{id}")
     public ResponseEntity<Long> updateComment(@PathVariable(name = "id") Long id,
             @RequestBody @Valid CommentDTO commentDTO) {
+        commentDTO.setId(id);
         commentService.update(id, commentDTO);
         return ResponseEntity.ok(id);
     }
