@@ -2,17 +2,22 @@ package com.egar.library.service;
 
 import com.egar.library.entity.Author;
 import com.egar.library.entity.Book;
+import com.egar.library.entity.Comment;
 import com.egar.library.entity.Genre;
 import com.egar.library.model.BookDTO;
 import com.egar.library.repos.AuthorRepository;
 import com.egar.library.repos.BookRepository;
+import com.egar.library.repos.CommentRepository;
 import com.egar.library.repos.GenreRepository;
 
 import java.util.List;
 
+import com.egar.library.util.NotFoundException;
+import com.egar.library.util.ReferencedWarning;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.sql.exec.ExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +26,10 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class BookService implements CRUDService<BookDTO> {
-
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final GenreRepository genreRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public List<BookDTO> findAll() {
@@ -47,7 +52,10 @@ public class BookService implements CRUDService<BookDTO> {
     public void create(BookDTO bookDTO) {
         log.info("Creating new book: {}", bookDTO);
         Book book = new Book();
+        Long id = bookDTO.getAuthorId();
+        Author author = authorRepository.findById(id).orElseThrow();
         mapToEntity(bookDTO, book);
+        book.setAuthor(author);
         bookRepository.save(book);
     }
 
@@ -56,6 +64,9 @@ public class BookService implements CRUDService<BookDTO> {
         log.info("Updating book with id: {}", id);
         Book book = bookRepository.findById(id)
                 .orElseThrow();
+        Long authorId = bookDTO.getAuthorId();
+        Author author = authorRepository.findById(authorId).orElseThrow();
+        book.setAuthor(author);
         mapToEntity(bookDTO, book);
         bookRepository.save(book);
     }
@@ -66,7 +77,7 @@ public class BookService implements CRUDService<BookDTO> {
         bookRepository.deleteById(id);
     }
 
-    private BookDTO mapToDTO(Book book, BookDTO bookDTO) {
+    private BookDTO mapToDTO(final Book book, final BookDTO bookDTO) {
         bookDTO.setId(book.getId());
         bookDTO.setName(book.getName());
         bookDTO.setAuthorId(book.getAuthor() == null ? null : book.getAuthor().getId());
@@ -74,16 +85,28 @@ public class BookService implements CRUDService<BookDTO> {
         return bookDTO;
     }
 
-    private Book mapToEntity(BookDTO bookDTO, Book book) {
-        book.setId(bookDTO.getId());
+    private Book mapToEntity(final BookDTO bookDTO, final Book book) {
         book.setName(bookDTO.getName());
-        Author author = bookDTO.getAuthorId() == null ? null : authorRepository.findById(bookDTO.getAuthorId())
-                .orElseThrow(() -> new ExecutionException("author not found"));
+        final Author author = bookDTO.getAuthorId() == null ? null : authorRepository.findById(bookDTO.getAuthorId())
+                .orElseThrow(() -> new NotFoundException("author not found"));
         book.setAuthor(author);
-        Genre genre = bookDTO.getGenreId() == null ? null : genreRepository.findById(bookDTO.getGenreId())
-                .orElseThrow(() -> new ExecutionException("genre not found"));
+        final Genre genre = bookDTO.getGenreId() == null ? null : genreRepository.findById(bookDTO.getGenreId())
+                .orElseThrow(() -> new NotFoundException("genre not found"));
         book.setGenre(genre);
         return book;
+    }
+
+    public ReferencedWarning getReferencedWarning(final Long id) {
+        final ReferencedWarning referencedWarning = new ReferencedWarning();
+        final Book book = bookRepository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        final Comment bookComment = commentRepository.findFirstByBook(book);
+        if (bookComment != null) {
+            referencedWarning.setKey("book.comment.book.referenced");
+            referencedWarning.addParam(bookComment.getId());
+            return referencedWarning;
+        }
+        return null;
     }
 
 }

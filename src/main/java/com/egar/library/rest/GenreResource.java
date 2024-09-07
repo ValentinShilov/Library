@@ -47,6 +47,7 @@ public class GenreResource {
     @PutMapping("/{id}")
     public ResponseEntity<Long> updateGenre(@PathVariable(name = "id") Long id,
             @RequestBody @Valid GenreDTO genreDTO) {
+        genreDTO.setId(id);
         genreService.update(id, genreDTO);
         return ResponseEntity.ok(id);
     }

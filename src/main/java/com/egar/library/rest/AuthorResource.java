@@ -49,6 +49,7 @@ public class AuthorResource {
     @PutMapping("/{id}")
     public ResponseEntity<Long> updateAuthor(@PathVariable(name = "id") Long id,
             @RequestBody @Valid AuthorDTO authorDTO) {
+        authorDTO.setId(id);
         authorService.update(id, authorDTO);
         return ResponseEntity.ok(id);
     }

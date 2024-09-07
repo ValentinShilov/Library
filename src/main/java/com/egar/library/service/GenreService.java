@@ -1,11 +1,15 @@
 package com.egar.library.service;
 
+import com.egar.library.entity.Book;
 import com.egar.library.entity.Genre;
 import com.egar.library.model.GenreDTO;
+import com.egar.library.repos.BookRepository;
 import com.egar.library.repos.GenreRepository;
 
 import java.util.List;
 
+import com.egar.library.util.NotFoundException;
+import com.egar.library.util.ReferencedWarning;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class GenreService implements CRUDService<GenreDTO> {
 
     private final GenreRepository genreRepository;
+    private final BookRepository bookRepository;
 
     @Override
     public List<GenreDTO> findAll() {
@@ -40,6 +45,10 @@ public class GenreService implements CRUDService<GenreDTO> {
     public void create(GenreDTO genreDTO) {
         log.info("Creating new genre: {}", genreDTO);
         Genre genre = new Genre();
+        Long id = genreDTO.getId();
+        if (id!= null) {
+            genre.setId(id);
+        }
         mapToEntity(genreDTO, genre);
         genreRepository.save(genre);
     }
@@ -69,5 +78,17 @@ public class GenreService implements CRUDService<GenreDTO> {
         genre.setId(genreDTO.getId());
         genre.setName(genreDTO.getName());
         return genre;
+    }
+    public ReferencedWarning getReferencedWarning(final Long id) {
+        final ReferencedWarning referencedWarning = new ReferencedWarning();
+        final Genre genre = genreRepository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        final Book genreBook = bookRepository.findFirstByGenre(genre);
+        if (genreBook != null) {
+            referencedWarning.setKey("genre.book.genre.referenced");
+            referencedWarning.addParam(genreBook.getId());
+            return referencedWarning;
+        }
+        return null;
     }
 }
