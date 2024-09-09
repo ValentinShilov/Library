@@ -48,7 +48,7 @@ public class UserResource {
         userService.update(id, userDTO);
         return ResponseEntity.ok(id);
     }
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @ApiResponse(responseCode = "204")
     public ResponseEntity<Void> deleteUser(@PathVariable(name = "id") Long id) {
         userService.delete(id);

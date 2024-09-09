@@ -1,5 +1,6 @@
 package com.egar.library.rest;
 
+import com.egar.library.entity.Book;
 import com.egar.library.model.BookDTO;
 import com.egar.library.service.BookService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/books")
 public class BookResource {
 
+    @Autowired
     private final BookService bookService;
 
     @GetMapping
@@ -57,4 +61,10 @@ public class BookResource {
         bookService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/search")
+    public List<BookDTO> search(@RequestParam String name) {
+        return bookService.findByName(name);
+    }
+
 }

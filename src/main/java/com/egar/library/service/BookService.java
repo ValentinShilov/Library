@@ -10,6 +10,8 @@ import com.egar.library.repos.BookRepository;
 import com.egar.library.repos.CommentRepository;
 import com.egar.library.repos.GenreRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.egar.library.util.NotFoundException;
@@ -26,9 +28,13 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class BookService implements CRUDService<BookDTO> {
+    @Autowired
     private final BookRepository bookRepository;
+    @Autowired
     private final AuthorRepository authorRepository;
+    @Autowired
     private final GenreRepository genreRepository;
+    @Autowired
     private final CommentRepository commentRepository;
 
     @Override
@@ -47,7 +53,12 @@ public class BookService implements CRUDService<BookDTO> {
                 .map(book -> mapToDTO(book, new BookDTO()))
                 .orElseThrow();
     }
-
+    public List<BookDTO> findByName(String name) {
+        List<Book> books = bookRepository.findByNameContainingIgnoreCase(name);
+        return books.stream()
+                .map(book -> mapToDTO(book, new BookDTO()))
+                .toList();
+    }
     @Override
     public void create(BookDTO bookDTO) {
         log.info("Creating new book: {}", bookDTO);
