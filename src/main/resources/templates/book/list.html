@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Книги</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex flex-wrap mb-4">
+        <h1 class="flex-grow-1">Книги</h1>
+        <div>
+            <a th:href="@{/books/add}" class="btn btn-primary ms-2">Добавить</a>
+        </div>
+    </div>
+
+    <form th:action="@{/books/search}" method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="query" class="form-control" placeholder="Поиск книги по названию" aria-label="Поиск книги">
+            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+        </div>
+    </form>
+
+    <div th:if="${books.empty}">Никаких книг найти не удалось.</div>
+
+    <div th:if="${!books.empty}">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Название</th>
+                <th>Автор</th>
+                <th>Жанр</th>
+                <th><!-- --></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td>[[${book.id}]]</td>
+                <td>[[${book.name}]]</td>
+                <td>[[${book.authorId}]]</td>
+                <td>[[${book.genreId}]]</td>
+                <td>
+                    <div>
+                        <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-secondary">Редактировать</a>
+                        <form th:action="@{/books/delete/{id}(id=${book.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-secondary">Удалить</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Главная</title>
+    <link th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{/css/app.css}" rel="stylesheet" />
+</head>
+<body>
+<div layout:fragment="content" class="text-center">
+    <div class="col-md-6 mx-auto">
+        <h4 class="mb-4">Исследуйте наш контент:</h4>
+        <div class="list-group">
+            <a th:href="@{/authors}" class="list-group-item list-group-item-action">Авторы</a>
+            <a th:href="@{/books}" class="list-group-item list-group-item-action">Книги</a>
+            <a class="list-group-item list-group-item-action" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">Поиск книги</a>
+            <a th:href="@{/favorites}" class="list-group-item list-group-item-action">Сохраненные/любимые книги</a>
+        </div>
+
+        <!-- Форма поиска -->
+        <div class="collapse mt-3" id="searchForm">
+            <form th:action="@{/books/search}" method="get" class="input-group mb-3">
+                <input type="text" name="name" class="form-control" placeholder="Введите название или автора" aria-label="Поиск">
+                <button class="btn btn-outline-secondary" type="submit">Искать</button>
+            </form>
+        </div>
+    </div>
+    <div class="mt-5">
+        <p class="text-muted">Добро пожаловать на нашу страницу! Мы рады видеть вас здесь.</p>
+        <span class="text-muted">Ознакомиться со </span>
+        <a th:href="@{/swagger-ui.html}" target="_blank">Swagger</a>
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}" defer></script>
+</body>
+</html>
