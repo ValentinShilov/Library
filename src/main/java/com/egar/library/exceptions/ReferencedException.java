@@ -1,5 +1,6 @@
-package com.egar.library.util;
+package com.egar.library.exceptions;
 
+import com.egar.library.util.ReferencedWarning;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

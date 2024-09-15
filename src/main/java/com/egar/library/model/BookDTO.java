@@ -14,8 +14,8 @@ public class BookDTO {
     @Size(max = 255)
     private String name;
 
-    private Long authorId;
+    private Long author;
 
-    private Long genreId;
+    private Long genre;
 
 }

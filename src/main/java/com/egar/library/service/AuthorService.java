@@ -3,13 +3,12 @@ package com.egar.library.service;
 import com.egar.library.entity.Author;
 import com.egar.library.entity.Book;
 import com.egar.library.model.AuthorDTO;
-import com.egar.library.model.BookDTO;
 import com.egar.library.repos.AuthorRepository;
 
 import java.util.List;
 
 import com.egar.library.repos.BookRepository;
-import com.egar.library.util.NotFoundException;
+import com.egar.library.exceptions.NotFoundException;
 import com.egar.library.util.ReferencedWarning;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
