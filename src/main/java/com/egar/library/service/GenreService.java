@@ -8,7 +8,7 @@ import com.egar.library.repos.GenreRepository;
 
 import java.util.List;
 
-import com.egar.library.util.NotFoundException;
+import com.egar.library.exceptions.NotFoundException;
 import com.egar.library.util.ReferencedWarning;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

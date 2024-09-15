@@ -10,15 +10,12 @@ import com.egar.library.repos.BookRepository;
 import com.egar.library.repos.CommentRepository;
 import com.egar.library.repos.GenreRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import com.egar.library.util.NotFoundException;
+import com.egar.library.exceptions.NotFoundException;
 import com.egar.library.util.ReferencedWarning;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.sql.exec.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -63,7 +60,7 @@ public class BookService implements CRUDService<BookDTO> {
     public void create(BookDTO bookDTO) {
         log.info("Creating new book: {}", bookDTO);
         Book book = new Book();
-        Long id = bookDTO.getAuthorId();
+        Long id = bookDTO.getAuthor();
         Author author = authorRepository.findById(id).orElseThrow();
         mapToEntity(bookDTO, book);
         book.setAuthor(author);
@@ -75,7 +72,7 @@ public class BookService implements CRUDService<BookDTO> {
         log.info("Updating book with id: {}", id);
         Book book = bookRepository.findById(id)
                 .orElseThrow();
-        Long authorId = bookDTO.getAuthorId();
+        Long authorId = bookDTO.getAuthor();
         Author author = authorRepository.findById(authorId).orElseThrow();
         book.setAuthor(author);
         mapToEntity(bookDTO, book);
@@ -91,17 +88,17 @@ public class BookService implements CRUDService<BookDTO> {
     private BookDTO mapToDTO(final Book book, final BookDTO bookDTO) {
         bookDTO.setId(book.getId());
         bookDTO.setName(book.getName());
-        bookDTO.setAuthorId(book.getAuthor() == null ? null : book.getAuthor().getId());
-        bookDTO.setGenreId(book.getGenre() == null ? null : book.getGenre().getId());
+        bookDTO.setAuthor(book.getAuthor() == null ? null : book.getAuthor().getId());
+        bookDTO.setGenre(book.getGenre() == null ? null : book.getGenre().getId());
         return bookDTO;
     }
 
     private Book mapToEntity(final BookDTO bookDTO, final Book book) {
         book.setName(bookDTO.getName());
-        final Author author = bookDTO.getAuthorId() == null ? null : authorRepository.findById(bookDTO.getAuthorId())
+        final Author author = bookDTO.getAuthor() == null ? null : authorRepository.findById(bookDTO.getAuthor())
                 .orElseThrow(() -> new NotFoundException("author not found"));
         book.setAuthor(author);
-        final Genre genre = bookDTO.getGenreId() == null ? null : genreRepository.findById(bookDTO.getGenreId())
+        final Genre genre = bookDTO.getGenre() == null ? null : genreRepository.findById(bookDTO.getGenre())
                 .orElseThrow(() -> new NotFoundException("genre not found"));
         book.setGenre(genre);
         return book;
