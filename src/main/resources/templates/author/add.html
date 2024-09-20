@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>Авторы</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="d-flex flex-wrap mb-4">
+    <h1 class="flex-grow-1">Авторы</h1>
+    <div>
+      <a th:href="@{/authors}" class="btn btn-secondary">Назад</a>
+    </div>
+  </div>
+  <div th:replace="~{fragments/forms::globalErrors('author')}" />
+  <form th:action="${requestUri}" method="post">
+    <div th:replace="~{fragments/forms::inputRow(object='author', field='name')}" />
+    <div th:replace="~{fragments/forms::inputRow(object='author', field='description')}" />
+    <input type="submit" th:value="Добавить" class="btn btn-primary mt-4" />
+  </form>
+</div>
+</body>
+</html>

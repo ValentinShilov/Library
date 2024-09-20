@@ -3,14 +3,14 @@ package com.egar.library.service;
 import com.egar.library.entity.Author;
 import com.egar.library.entity.Book;
 import com.egar.library.entity.Comment;
-import com.egar.library.entity.Genre;
 import com.egar.library.model.BookDTO;
 import com.egar.library.repos.AuthorRepository;
 import com.egar.library.repos.BookRepository;
 import com.egar.library.repos.CommentRepository;
-import com.egar.library.repos.GenreRepository;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.egar.library.exceptions.NotFoundException;
 import com.egar.library.util.ReferencedWarning;
@@ -29,8 +29,6 @@ public class BookService implements CRUDService<BookDTO> {
     private final BookRepository bookRepository;
     @Autowired
     private final AuthorRepository authorRepository;
-    @Autowired
-    private final GenreRepository genreRepository;
     @Autowired
     private final CommentRepository commentRepository;
 
@@ -85,11 +83,42 @@ public class BookService implements CRUDService<BookDTO> {
         bookRepository.deleteById(id);
     }
 
+    public List<Book> findBooksByAuthorId(Long authorId) {
+        return bookRepository.findByAuthorId(authorId);
+    }
+    public List<BookDTO> filterAndSortBooks(String query, String sort) {
+        List<BookDTO> books = findAll();
+
+        if (query != null && !query.isEmpty()) {
+            books = books.stream()
+                    .filter(book -> book.getName().toLowerCase().contains(query.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        if ("author".equals(sort)) {
+            books.sort(Comparator.comparing(BookDTO::getAuthor));
+        } else {
+            books.sort(Comparator.comparing(BookDTO::getName));
+        }
+
+        return books;
+    }
+
+    public Comment saveComment(Long bookId, Comment comment) {
+        Book book = bookRepository.findById(bookId).orElse(null);
+        if (book != null) {
+            comment.setBook(book);
+            return commentRepository.save(comment);
+        }
+        return null;
+    }
+
+
+
     private BookDTO mapToDTO(final Book book, final BookDTO bookDTO) {
         bookDTO.setId(book.getId());
         bookDTO.setName(book.getName());
         bookDTO.setAuthor(book.getAuthor() == null ? null : book.getAuthor().getId());
-        bookDTO.setGenre(book.getGenre() == null ? null : book.getGenre().getId());
         return bookDTO;
     }
 
@@ -98,9 +127,6 @@ public class BookService implements CRUDService<BookDTO> {
         final Author author = bookDTO.getAuthor() == null ? null : authorRepository.findById(bookDTO.getAuthor())
                 .orElseThrow(() -> new NotFoundException("author not found"));
         book.setAuthor(author);
-        final Genre genre = bookDTO.getGenre() == null ? null : genreRepository.findById(bookDTO.getGenre())
-                .orElseThrow(() -> new NotFoundException("genre not found"));
-        book.setGenre(genre);
         return book;
     }
 

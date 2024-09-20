@@ -33,6 +33,13 @@ public class CommentService implements CRUDService<CommentDTO> {
                 .map(comment -> mapToDTO(comment, new CommentDTO()))
                 .toList();
     }
+    public List<CommentDTO> getCommentsByBookId(Long bookId) {
+        List<Comment>comments =  commentRepository.findByBookId(bookId);
+        return comments.stream()
+                .map(comment -> mapToDTO(comment, new CommentDTO()))
+                .toList();
+    }
+
 
     @Override
     public CommentDTO getById(Long id) {
@@ -42,11 +49,17 @@ public class CommentService implements CRUDService<CommentDTO> {
                 .orElseThrow();
     }
 
-    @Override
     public void create(final CommentDTO commentDTO) {
         log.info("Creating new comment: {}", commentDTO);
+
         Comment comment = new Comment();
         mapToEntity(commentDTO, comment);
+
+        Book book = bookRepository.findById(commentDTO.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        comment.setBook(book);
+
         commentRepository.save(comment);
     }
 
@@ -68,7 +81,6 @@ public class CommentService implements CRUDService<CommentDTO> {
     private CommentDTO mapToDTO(Comment comment, CommentDTO commentDTO) {
         commentDTO.setId(comment.getId());
         commentDTO.setText(comment.getText());
-        commentDTO.setEvaluation(comment.getEvaluation());
         commentDTO.setUserId(comment.getUser() == null ? null : comment.getUser().getId());
         commentDTO.setBookId(comment.getBook() == null ? null : comment.getBook().getId());
         return commentDTO;
@@ -77,14 +89,12 @@ public class CommentService implements CRUDService<CommentDTO> {
     private Comment mapToEntity(CommentDTO commentDTO, Comment comment) {
         comment.setId(commentDTO.getId());
         comment.setText(commentDTO.getText());
-        comment.setEvaluation(commentDTO.getEvaluation());
         User user = commentDTO.getUserId() == null ? null : userRepository.findById(commentDTO
                         .getUserId())
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("User not found"));
         comment.setUser(user);
-        Book book = commentDTO.getBookId() == null ? null : bookRepository.findById(commentDTO
-                        .getBookId())
-                .orElseThrow();
+        Book book = bookRepository.findById(commentDTO.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found"));
         comment.setBook(book);
         return comment;
     }

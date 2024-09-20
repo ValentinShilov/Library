@@ -2,10 +2,12 @@ package com.egar.library.controller;
 
 import com.egar.library.service.AuthorService;
 import com.egar.library.model.AuthorDTO;
+import com.egar.library.service.BookService;
 import com.egar.library.util.ReferencedWarning;
 import com.egar.library.util.WebUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +25,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthorController {
 
     private final AuthorService authorService;
+
+    private final BookService bookService;
 
     @GetMapping
     public String list(final Model model) {
@@ -76,6 +80,12 @@ public class AuthorController {
             redirectAttributes.addFlashAttribute(WebUtils.MSG_INFO, WebUtils.getMessage("author.delete.success"));
         }
         return "redirect:/authors";
+    }
+    @GetMapping("/{id}/books")
+    public String getBooksByAuthor(@PathVariable Long id, Model model) {
+        model.addAttribute("author", authorService.getById(id));
+        model.addAttribute("books", bookService.findBooksByAuthorId(id));
+        return "author/book";
     }
 
 }

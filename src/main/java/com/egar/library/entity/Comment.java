@@ -26,8 +26,6 @@ public class Comment {
     @Column
     private String text;
 
-    @Column
-    private String evaluation;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")

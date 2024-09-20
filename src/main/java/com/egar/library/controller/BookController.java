@@ -1,17 +1,18 @@
 package com.egar.library.controller;
 
+import com.egar.library.model.CommentDTO;
 import com.egar.library.service.BookService;
 import com.egar.library.entity.Author;
-import com.egar.library.entity.Genre;
 import com.egar.library.model.BookDTO;
 import com.egar.library.repos.AuthorRepository;
-import com.egar.library.repos.GenreRepository;
+import com.egar.library.service.CommentService;
 import com.egar.library.util.CustomCollectors;
 import com.egar.library.util.ReferencedWarning;
 import com.egar.library.util.WebUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 
 @Controller
 @AllArgsConstructor
@@ -31,16 +34,13 @@ public class BookController {
 
     private final BookService bookService;
     private final AuthorRepository authorRepository;
-    private final GenreRepository genreRepository;
+    private final CommentService commentService;
 
     @ModelAttribute
     public void prepareContext(final Model model) {
         model.addAttribute("authorValues", authorRepository.findAll(Sort.by("id"))
                 .stream()
                 .collect(CustomCollectors.toSortedMap(Author::getId, Author::getId)));
-        model.addAttribute("genreValues", genreRepository.findAll(Sort.by("id"))
-                .stream()
-                .collect(CustomCollectors.toSortedMap(Genre::getId, Genre::getId)));
     }
 
     @GetMapping
@@ -92,6 +92,28 @@ public class BookController {
         }
         return "book/search";
     }
+    @GetMapping("/filter")
+    public String searchBooks(@RequestParam(required = false) String query,
+                              @RequestParam(required = false) String sort,
+                              Model model) {
+        List<BookDTO> books = bookService.filterAndSortBooks(query, sort);
+
+        model.addAttribute("books", books);
+        return "book/list";
+    }
+    @GetMapping("/{id}/comments")
+    public String getCommentsByBookId(@PathVariable(name = "id") Long id, Model model) {
+        BookDTO book = bookService.getById(id);
+        List<CommentDTO> comments = commentService.getCommentsByBookId(id);
+
+        model.addAttribute("book", book);
+        model.addAttribute("comments", comments);
+
+        return "book/comment";
+    }
+
+
+
 
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable(name = "id") Long id,
