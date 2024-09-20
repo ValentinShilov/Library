@@ -1,5 +1,6 @@
 package com.egar.library.rest;
 
+import com.egar.library.entity.Comment;
 import com.egar.library.model.CommentDTO;
 import com.egar.library.service.CommentService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -39,7 +41,7 @@ public class CommentResource {
 
     @PostMapping
     @ApiResponse(responseCode = "201")
-    public ResponseEntity<Long> createComment(@RequestBody @Valid CommentDTO commentDTO) {
+    public ResponseEntity<Long> createComment(@RequestParam CommentDTO commentDTO) {
         commentService.create(commentDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

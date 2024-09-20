@@ -1,4 +1,4 @@
-package com.egar.library.web.rest;
+package com.egar.library.web.controller;
 
 import com.egar.library.exceptions.AlreadyExitsException;
 import com.egar.library.repos.UserRepository;

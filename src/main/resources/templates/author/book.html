@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Книги автора: [[${author.name}]]</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>Книги автора: [[${author.name}]]</h1>
+    <div th:if="${books.empty}">У данного автора нет книг.</div>
+    <div th:if="${!books.empty}" class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Название</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td>[[${book.id}]]</td>
+                <td>[[${book.name}]]</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <a th:href="@{/authors}" class="btn btn-primary">Назад к авторам</a>
+</div>
+</body>
+</html>
